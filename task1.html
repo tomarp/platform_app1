@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 5: Verbal-Semantic Task</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="page-container" class="container"></div>
+
+    <script>
+        const audioFiles = Array.from({ length: 10 }, (_, i) => `auditoryText/audio_${i + 1}.mp3`);
+
+        const pages = [
+            { 
+                content: `
+                    <h1>Welcome to Verbal-Semantic Task</h1>
+                    <h2>Next page you will see an audio file. <br> Play and listen the audio and identify if the audio statement has semantic inconsistency (i.e., something that doesn’t logically fit or is incorrect).</h2>
+                    <button id="next-button">Next</button>
+                `, 
+                time: 0 // No timer for the first page
+            },
+            ...audioFiles.map((audioSrc, index) => ({
+                content: `
+                    <h2>Audio Statement ${index + 1}</h2>
+                    <h3>Click on play-icon and listen to the audio statement. <br>Replay audio if needed, and select the desired option.</h3> 
+                    <audio controls><source src="${audioSrc}" type="audio/mpeg">Your browser does not support the audio element.</audio>
+                    <div class="options">
+                        <label><input type="checkbox" name="audioQ${index + 1}"> <span>Option A: There was INCONSISTENCY in the sentence.</span></label> <br>
+                        <label><input type="checkbox" name="audioQ${index + 1}"> <span>Option B: There was NO INCONSISTENCY in the sentence.</span></label> <br>
+                        <label><input type="checkbox" name="audioQ${index + 1}"> <span>Option C: There was INCONSISTENCY in the sentence but was CORRECTED.</span></label> <br>
+                    </div>
+                    ${timerTemplate()}
+                `,
+                time: 60
+            }))
+        ];
+
+        let currentPage = 0;
+        const container = document.getElementById("page-container");
+
+        function timerTemplate() {
+            return `
+                <div class="timer-container">
+                    <svg class="timer-svg" width="150" height="150">
+                        <circle class="timer-circle-bg" cx="75" cy="75" r="70"></circle>
+                        <circle class="timer-circle" cx="75" cy="75" r="70"></circle>
+                    </svg>
+                    <div class="timer-text" id="timer">0s</div>
+                </div>
+            `;
+        }
+
+        function loadPage(index) {
+            container.innerHTML = pages[index].content;
+
+            // Add event listener for the "Next" button on the first page
+            if (index === 0) {
+                const nextButton = document.getElementById("next-button");
+                nextButton.addEventListener("click", () => {
+                    // Start playing the background audio
+                    const backgroundAudio = document.getElementById("background-audio");
+                    backgroundAudio.play();
+
+                    // Load the next page
+                    currentPage++;
+                    loadPage(currentPage);
+                });
+            } else {
+                // Start the timer for subsequent pages
+                startTimer(pages[index].time, () => {
+                    if (++currentPage < pages.length) loadPage(currentPage);
+                    else window.location.href = "survey2_1.html";
+                });
+            }
+        }
+
+        function startTimer(seconds, callback) {
+            const timerElement = document.getElementById("timer");
+            const progressCircle = document.querySelector(".timer-circle");
+            const totalLength = progressCircle.getTotalLength();
+            progressCircle.style.strokeDasharray = totalLength;
+
+            let remaining = seconds;
+            timerElement.textContent = `${remaining}s`;
+
+            const interval = setInterval(() => {
+                timerElement.textContent = `${--remaining}s`;
+                progressCircle.style.strokeDashoffset = totalLength * (remaining / seconds);
+
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    callback();
+                }
+            }, 1000);
+        }
+
+        // Load the first page
+        loadPage(currentPage);
+    </script>
+
+    <!-- Background Audio Element -->
+    <audio id="background-audio" loop>
+        <source src="auditoryBeats/10HzBinauralBeats.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+</body>
+</html>

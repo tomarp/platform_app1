@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 4: BASELINE Recording</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="page-container" class="container"></div>
+    <body data-page="baseline">
+
+        
+    <script>
+        function loadBaseline() {
+            document.getElementById("page-container").innerHTML = `
+                <h1>BASELINE Recording</h1>
+                <h2>Stay in a resting position while keeping your eyes open with minimal body movement.</h2>
+                <div class="timer-container">
+                    <svg class="timer-svg" width="150" height="150">
+                        <circle class="timer-circle-bg" cx="75" cy="75" r="70"></circle>
+                        <circle class="timer-circle" cx="75" cy="75" r="70"></circle>
+                    </svg>
+                    <div class="timer-text" id="timer">300s</div>
+                </div>
+            `;
+            startTimer(300, () => window.location.href = "task1.html");
+        }
+
+        function startTimer(seconds, callback) {
+            const timerElement = document.getElementById("timer");
+            const progressCircle = document.querySelector(".timer-circle");
+            const totalLength = progressCircle.getTotalLength();
+            progressCircle.style.strokeDasharray = totalLength;
+
+            let remaining = seconds;
+            timerElement.textContent = `${remaining}s`;
+
+            const interval = setInterval(() => {
+                timerElement.textContent = `${--remaining}s`;
+                progressCircle.style.strokeDashoffset = totalLength * (remaining / seconds);
+
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    callback();
+                }
+            }, 1000);
+        }
+
+        loadBaseline();
+    </script>
+</body>
+</html>

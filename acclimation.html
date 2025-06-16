@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 2: Acclimation Time</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Acclimation Time in progress...</h2>
+        <h3>Please wait for the instructions and read them carefully:</h3>
+        <div class="timer-container">
+            <svg class="timer-svg" width="150" height="150">
+                <circle class="timer-circle-bg" cx="75" cy="75" r="70"></circle>
+                <circle class="timer-circle" cx="75" cy="75" r="70"></circle>
+            </svg>
+            <div class="timer-text" id="timer">160s</div>
+        </div>
+        <div class="dynamic-text">
+            <h4><span id="typing-effect"></span></h4>
+            <!-- <span class="cursor">|</span> -->
+        </div>
+    </div>
+
+    <script>
+        function startTimer(seconds, nextStep) {
+            const timerElement = document.getElementById("timer");
+            const progressCircle = document.querySelector(".timer-circle");
+            const totalLength = progressCircle.getTotalLength();
+            progressCircle.style.strokeDasharray = totalLength;
+
+            let remaining = seconds;
+            timerElement.textContent = `${remaining}s`;
+
+            const interval = setInterval(() => {
+                timerElement.textContent = `${--remaining}s`;
+                progressCircle.style.strokeDashoffset = totalLength * (remaining / seconds);
+
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    nextStep();
+                }
+            }, 1000);
+        }
+
+        startTimer(150, () => window.location.href = "baseline.html");
+    </script>
+    <script src="dynamicText.js"></script>
+    
+</body>
+</html>

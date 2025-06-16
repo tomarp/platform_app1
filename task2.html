@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 7: Optical Illusion Task</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    
+    <div id="page-container" class="container"></div>
+
+    <script>
+        const imagePages = [
+            { src: "./visuospatial/Dog-optical-illusion.jpg", instruction: "Could you find the hidden human face in the picture?", time: 60 },
+            { src: "./visuospatial/faceInCoffeeBean.jpg", instruction: "Spot the hidden face in coffee beans.", time: 60 },
+            { src: './visuospatial/HiddenTiger.jpg', instruction: "Locate the hidden tiger in the image.", time: 60 },
+            { src: './visuospatial/countPandas.jpg', instruction: "There are more than 2 pandas in this picture. Can you spot them all?", time: 60 },
+            { src: './visuospatial/countHumanFaces.webp', instruction: "Count 6 or more human faces in the image.", time: 60 },
+            { src: './visuospatial/ninePeopleFaces2.jpg', instruction: "Let's see if you can count 9 people in this illusion.", time: 60 },
+            { src: './visuospatial/horseFaces.webp', instruction: "Could you Identify more than 10 horse faces in the picture?", time: 60 },
+            { src: './visuospatial/HowmanyAnimals.webp', instruction: "Spot and Count 18 different animals in the image.", time: 60 },
+            { src: './visuospatial/sixteenFaces.jpg', instruction: "Could you count 16 faces there in the picture?", time: 60 },
+            { src: './visuospatial/thirteenHiddenFaces.webp', instruction: "Can you find all 13 hidden faces.", time: 60 }
+        ];
+
+        const pages = [
+            { 
+                content: `
+                    <h1>Welcome to Optical Illusion Task</h1>
+                    <h2>You will be shown images on your screen where you will be asked to find patterns.</h2>
+                    <button id="next-button">Next</button>
+                `, 
+                time: 0 // No timer for the first page
+            },
+            ...imagePages.map((img, i) => ({
+                content: `
+                    <h2>Optical Illusion ${i + 1}</h2>
+                    <p>${img.instruction}</p>
+                    <img src="${img.src}" alt="Puzzle ${i + 1}" style="width: 90%; max-width: 600px; height:auto;">
+                    <div class="options">
+                        <label><input type="checkbox" name="img${i + 1}"> Option A: I solved the puzzle.</label> <br>
+                        <label><input type="checkbox" name="img${i + 1}"> Option B: I couldn't solve the puzzle.</label> <br>
+                        <label><input type="checkbox" name="img${i + 1}"> Option C: I'm not sure if there is a solution.</label> <br>
+                    </div>
+                    ${timerTemplate()}
+                `,
+                time: img.time
+            }))
+        ];
+
+        let currentPage = 0;
+        const container = document.getElementById("page-container");
+
+        function timerTemplate() {
+            return `
+                <div class="timer-container">
+                    <svg class="timer-svg" width="150" height="150">
+                        <circle class="timer-circle-bg" cx="75" cy="75" r="70"></circle>
+                        <circle class="timer-circle" cx="75" cy="75" r="70"></circle>
+                    </svg>
+                    <div class="timer-text" id="timer">0s</div>
+                </div>
+            `;
+        }
+
+        function loadPage(index) {
+            container.innerHTML = pages[index].content;
+            startTimer(pages[index].time, () => {
+                if (++currentPage < pages.length) loadPage(currentPage);
+                else window.location.href = "survey2_2.html";
+            });
+        }
+
+        function loadPage(index) {
+            container.innerHTML = pages[index].content;
+
+            // Add event listener for the "Next" button on the first page
+            if (index === 0) {
+                const nextButton = document.getElementById("next-button");
+                nextButton.addEventListener("click", () => {
+                    // Start playing the background audio
+                    const backgroundAudio = document.getElementById("background-audio");
+                    backgroundAudio.play();
+
+                    // Load the next page
+                    currentPage++;
+                    loadPage(currentPage);
+                });
+            } else {
+                // Start the timer for subsequent pages
+                startTimer(pages[index].time, () => {
+                    if (++currentPage < pages.length) loadPage(currentPage);
+                    else window.location.href = "survey2_2.html";
+                });
+            }
+        }
+
+        function startTimer(seconds, callback) {
+            const timerElement = document.getElementById("timer");
+            const progressCircle = document.querySelector(".timer-circle");
+            const totalLength = progressCircle.getTotalLength();
+            progressCircle.style.strokeDasharray = totalLength;
+
+            let remaining = seconds;
+            timerElement.textContent = `${remaining}s`;
+
+            const interval = setInterval(() => {
+                timerElement.textContent = `${--remaining}s`;
+                progressCircle.style.strokeDashoffset = totalLength * (remaining / seconds);
+
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    callback();
+                }
+            }, 1000);
+        }
+
+        loadPage(currentPage);
+    </script>
+    <!-- Background Audio Element -->
+    <audio id="background-audio" loop>
+        <source src="auditoryBeats/40HzBinauralBeats.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 3: General Survey</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="page-container" class="container"></div>
+
+    <script>
+        const pages = [
+            {
+                content: `
+                    <h2>This is Acclimation Time period, please complete the GENERAL SURVEY on the next page.</h2>
+                    <div class="timer-container">
+                        <svg class="timer-svg" width="150" height="150">
+                            <circle class="timer-circle-bg" cx="75" cy="75" r="70"></circle>
+                            <circle class="timer-circle" cx="75" cy="75" r="70"></circle>
+                        </svg>
+                        <div class="timer-text" id="timer">20s</div>
+                    </div>
+                `,
+                time: 10
+            },
+            {
+                content: `
+                    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfwXS4vgz9DYN5cqy4TK3xe8BmVqNFEnBwxdL2pHy8rB0-Xxw/viewform?embedded=true" 
+                            width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+                    <div class="timer-container">
+                        <svg class="timer-svg" width="150" height="150">
+                            <circle class="timer-circle-bg" cx="75" cy="75" r="70"></circle>
+                            <circle class="timer-circle" cx="75" cy="75" r="70"></circle>
+                        </svg>
+                        <div class="timer-text" id="timer">120s</div>
+                    </div>
+                `,
+                time: 120
+            }
+        ];
+
+        let currentPage = 0;
+        const container = document.getElementById("page-container");
+
+        function loadPage(index) {
+            container.innerHTML = pages[index].content;
+            startTimer(pages[index].time, () => {
+                if (++currentPage < pages.length) loadPage(currentPage);
+                else window.location.href = "acclimation.html";
+            });
+        }
+
+        function startTimer(seconds, callback) {
+            const timerElement = document.getElementById("timer");
+            const progressCircle = document.querySelector(".timer-circle");
+            const totalLength = progressCircle.getTotalLength();
+            progressCircle.style.strokeDasharray = totalLength;
+
+            let remaining = seconds;
+            timerElement.textContent = `${remaining}s`;
+
+            const interval = setInterval(() => {
+                timerElement.textContent = `${--remaining}s`;
+                progressCircle.style.strokeDashoffset = totalLength * (remaining / seconds);
+
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    callback();
+                }
+            }, 1000);
+        }
+
+        loadPage(currentPage);
+    </script>
+</body>
+</html>
